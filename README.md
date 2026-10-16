@@ -23,17 +23,18 @@ This project is a PostgreSQL-backed prototype for managing education-support res
 
 ```text
 .
-|-- sql/
-|   |-- 01_schema.sql          # Tables, keys, constraints, and indexes
-|   |-- 02_seed_data.sql       # Synthetic development/demo data
-|   |-- 03_views_queries.sql   # Views and representative reports
-|   |-- 04_transactions.sql    # Transaction-related SQL, if applicable
-|   `-- 05_tests.sql           # Constraint and transaction test cases
+|-- database/
+|   |-- schema.sql             # Tables, keys, constraints, indexes, and views
+|   |-- seed.sql               # Synthetic development/demo data
+|   |-- verification.sql       # Data and schema verification queries
+|   |-- crud.sql               # CRUD demonstration queries
+|   `-- constraint_tests.sql   # Negative constraint tests
 |-- app/
 |   |-- app.py                 # Streamlit entry point
 |   |-- db.py                  # PostgreSQL connection helper
 |   |-- services.py            # Application, review, allocation business logic
-|   `-- queries.py             # Query/report functions used by the UI
+|   |-- queries.py             # Query/report functions used by the UI
+|   `-- test_connection.py     # Database connection check
 |-- docs/
 |   |-- ERD.png
 |   |-- relational_schema.png
@@ -87,10 +88,10 @@ createdb -U postgres remote_education_db
 Run the SQL scripts in order:
 
 ```powershell
-psql -U postgres -d remote_education_db -f sql\01_schema.sql
-psql -U postgres -d remote_education_db -f sql\02_seed_data.sql
-psql -U postgres -d remote_education_db -f sql\03_views_queries.sql
-psql -U postgres -d remote_education_db -f sql\04_transactions.sql
+psql -U postgres -d remote_education_db -f database\schema.sql
+psql -U postgres -d remote_education_db -f database\seed.sql
+psql -U postgres -d remote_education_db -f database\verification.sql
+psql -U postgres -d remote_education_db -f database\constraint_tests.sql
 ```
 
 Alternatively, open each file in pgAdmin Query Tool and run it in the same order.
@@ -118,6 +119,12 @@ streamlit run app\app.py
 ```
 
 Open the local URL shown in the terminal, usually `http://localhost:8501`.
+
+To check the Python database connection before launching the interface:
+
+```powershell
+.venv\Scripts\python.exe -m app.test_connection
+```
 
 ## Main prototype workflow
 
@@ -153,7 +160,7 @@ git push origin main
 
 Suggested ownership:
 
-- **SQL/database member:** maintains scripts in `sql/`, including schema changes and seed data.
+- **SQL/database member:** maintains scripts in `database/`, including schema changes and seed data.
 - **Python/backend member:** maintains the database connection and business logic in `app/`.
 - **UI/integration member:** maintains Streamlit pages, integrates features, and prepares the demo workflow.
 
