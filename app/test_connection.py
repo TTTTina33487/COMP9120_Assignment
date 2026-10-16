@@ -6,7 +6,10 @@ import sys
 
 import psycopg
 
-from app.db import get_connection
+try:  # Supports `python -m app.test_connection`.
+    from .db import get_connection
+except ImportError:  # Supports `python app/test_connection.py`.
+    from db import get_connection
 
 
 def main() -> int:
