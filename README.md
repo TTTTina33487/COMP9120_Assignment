@@ -16,7 +16,6 @@ This project is a PostgreSQL-backed prototype for managing education-support res
 
 - **Database:** PostgreSQL
 - **Application:** Python
-- **Prototype UI:** Streamlit
 - **Database driver:** psycopg
 
 ## Repository structure
@@ -30,10 +29,9 @@ This project is a PostgreSQL-backed prototype for managing education-support res
 |   |-- crud.sql               # CRUD demonstration queries
 |   `-- constraint_tests.sql   # Negative constraint tests
 |-- app/
-|   |-- app.py                 # Streamlit entry point
 |   |-- db.py                  # PostgreSQL connection helper
 |   |-- services.py            # Application, review, allocation business logic
-|   |-- queries.py             # Query/report functions used by the UI
+|   |-- queries.py             # Query and report functions for the prototype
 |   `-- test_connection.py     # Database connection check
 |-- docs/
 |   |-- ERD.png
@@ -112,19 +110,14 @@ DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/remote_education
 
 Do not commit `.env` to GitHub. It must be listed in `.gitignore`.
 
-### 6. Run the prototype
-
-```powershell
-streamlit run app\app.py
-```
-
-Open the local URL shown in the terminal, usually `http://localhost:8501`.
-
-To check the Python database connection before launching the interface:
+### 6. Test the Python backend connection
 
 ```powershell
 .venv\Scripts\python.exe -m app.test_connection
 ```
+
+The `app/` directory contains the Python backend layer. A separate team member
+may connect these functions to the final user interface.
 
 ## Main prototype workflow
 
@@ -162,7 +155,7 @@ Suggested ownership:
 
 - **SQL/database member:** maintains scripts in `database/`, including schema changes and seed data.
 - **Python/backend member:** maintains the database connection and business logic in `app/`.
-- **UI/integration member:** maintains Streamlit pages, integrates features, and prepares the demo workflow.
+- **UI/integration member:** connects the backend functions to the final interface and prepares the demo workflow.
 
 If a schema change affects table names, columns, data types, keys, or constraints, the database member should notify the group. Other members should re-run the updated scripts against a fresh local database before testing their code.
 
