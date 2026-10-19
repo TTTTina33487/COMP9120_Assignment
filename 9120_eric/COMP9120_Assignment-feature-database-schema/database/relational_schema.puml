@@ -1,0 +1,159 @@
+@startuml
+title Remote Education Resource Allocation Relational Schema
+left to right direction
+hide circle
+hide methods
+skinparam linetype ortho
+skinparam shadowing false
+skinparam entity {
+  BackgroundColor #F7F9FC
+  BorderColor #17365D
+  FontColor #17202A
+}
+
+entity REGION {
+  * region_id : BIGINT <<PK>>
+  --
+  region_name : VARCHAR <<UQ>>
+  remoteness_level : VARCHAR
+  internet_access_level : VARCHAR
+  support_priority_level : VARCHAR
+}
+
+entity SCHOOL {
+  * school_id : BIGINT <<PK>>
+  --
+  region_id : BIGINT <<FK>>
+  school_name : VARCHAR
+  school_type : VARCHAR
+  (region_id, school_name) <<UQ>>
+}
+
+entity COORDINATOR {
+  * coordinator_id : BIGINT <<PK>>
+  --
+  school_id : BIGINT <<FK>>
+  coordinator_name : VARCHAR
+  role : VARCHAR
+}
+
+entity STUDENT {
+  * student_id : BIGINT <<PK>>
+  --
+  school_id : BIGINT <<FK>>
+  first_name : VARCHAR
+  last_name : VARCHAR
+  year_level : SMALLINT
+  has_device : BOOLEAN
+  internet_access_level : VARCHAR
+}
+
+entity ELIGIBILITY_TYPE {
+  * eligibility_type_id : BIGINT <<PK>>
+  --
+  type_name : VARCHAR <<UQ>>
+  description : TEXT
+}
+
+entity STUDENT_ELIGIBILITY {
+  * student_id : BIGINT <<PK, FK>>
+  * eligibility_type_id : BIGINT <<PK, FK>>
+  --
+  verified_date : DATE
+  expiry_date : DATE
+  verification_status : VARCHAR
+}
+
+entity ORGANISATION {
+  * organisation_id : BIGINT <<PK>>
+  --
+  organisation_name : VARCHAR <<UQ>>
+  contact_email : VARCHAR <<UQ>>
+}
+
+entity PROVIDER {
+  * organisation_id : BIGINT <<PK, FK>>
+}
+
+entity FUNDER {
+  * organisation_id : BIGINT <<PK, FK>>
+}
+
+entity RESOURCE_OFFERING {
+  * offering_id : BIGINT <<PK>>
+  --
+  provider_id : BIGINT <<FK>>
+  required_eligibility_type_id : BIGINT <<FK, NULL>>
+  resource_name : VARCHAR
+  resource_type : VARCHAR
+  subject_area : VARCHAR
+  total_quantity : INTEGER
+  expiry_date : DATE
+}
+
+entity RESOURCE_FUNDING {
+  * offering_id : BIGINT <<PK, FK>>
+  * funder_id : BIGINT <<PK, FK>>
+}
+
+entity APPLICATION {
+  * application_id : BIGINT <<PK>>
+  --
+  student_id : BIGINT <<FK>>
+  offering_id : BIGINT <<FK>>
+  reviewer_id : BIGINT <<FK, NULL>>
+  application_date : DATE
+  requested_quantity : INTEGER
+  learning_goal : TEXT
+  priority_level : VARCHAR
+  decision_status : VARCHAR
+  decision_date : TIMESTAMPTZ <<NULL>>
+  decision_reason : TEXT <<NULL>>
+}
+
+entity ALLOCATION {
+  * allocation_id : BIGINT <<PK>>
+  --
+  application_id : BIGINT <<FK>>
+  allocation_date : TIMESTAMPTZ
+  quantity_allocated : INTEGER
+  allocation_status : VARCHAR
+}
+
+entity USAGE_RECORD {
+  * allocation_id : BIGINT <<PK, FK>>
+  * record_no : INTEGER <<PK, partial key>>
+  --
+  record_date : DATE
+  usage_type : VARCHAR
+  usage_status : VARCHAR
+  notes : TEXT <<NULL>>
+}
+
+REGION ||--o{ SCHOOL : contains
+SCHOOL ||--o{ COORDINATOR : employs
+SCHOOL ||--o{ STUDENT : enrols
+STUDENT ||--o{ STUDENT_ELIGIBILITY : holds
+ELIGIBILITY_TYPE ||--o{ STUDENT_ELIGIBILITY : classifies
+
+ORGANISATION ||--o| PROVIDER : overlapping ISA
+ORGANISATION ||--o| FUNDER : overlapping ISA
+PROVIDER ||--o{ RESOURCE_OFFERING : provides
+ELIGIBILITY_TYPE |o--o{ RESOURCE_OFFERING : required by
+FUNDER ||--o{ RESOURCE_FUNDING : funds
+RESOURCE_OFFERING ||--o{ RESOURCE_FUNDING : funded through
+
+STUDENT ||--o{ APPLICATION : submits
+RESOURCE_OFFERING ||--o{ APPLICATION : requested in
+COORDINATOR |o--o{ APPLICATION : reviews
+APPLICATION ||--o{ ALLOCATION : results in
+ALLOCATION ||--o{ USAGE_RECORD : identifies
+
+legend bottom
+  |= Mark |= Meaning |
+  | PK | Primary key |
+  | FK | Foreign key |
+  | UQ | Unique constraint |
+  | NULL | Optional attribute |
+endlegend
+@enduml
