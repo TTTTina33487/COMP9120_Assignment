@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Sign in{% endblock %}
+{% block content %}
+<section class="login-layout">
+  <div class="login-story">
+    <div class="eyebrow">9120 / REMOTE EDUCATION HUB</div>
+    <h1>Bridge the distance.<br>Make learning<br><em>possible.</em></h1>
+    <p>Connect remote learners, school coordinators and educational resources, so support reaches the people who need it.</p>
+    <div class="story-stats"><div><strong>05</strong><span>Regions</span></div><div><strong>10</strong><span>Demo students</span></div><div><strong>08</strong><span>Offerings</span></div></div>
+    <div class="story-orbit" aria-hidden="true">↗</div>
+  </div>
+  <div class="login-card">
+    <span class="eyebrow">YOUR LEARNING WORKSPACE</span>
+    <h2>Welcome back.</h2>
+    <p class="muted">Sign in to access your applications and support resources.</p>
+    <form method="post" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+      <label for="username">Account</label>
+      <input id="username" name="username" type="text" autocomplete="username" maxlength="80" placeholder="Enter your account ID" value="{{ request.form.get('username', '') }}" required autofocus>
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" maxlength="1024" placeholder="Enter your password" required>
+      <label for="identity">Workspace</label>
+      <select id="identity" name="identity" required>
+        {% for s in identities[0] %}<option value="student:{{ s.student_id }}" {{ 'selected' if request.form.get('identity','student:1') == 'student:' ~ s.student_id }}>Student · {{ s.student_name }} · {{ s.school_name }}</option>{% endfor %}
+        {% for c in identities[1] %}<option value="coordinator:{{ c.coordinator_id }}" {{ 'selected' if request.form.get('identity') == 'coordinator:' ~ c.coordinator_id }}>Coordinator · {{ c.coordinator_name }} · {{ c.school_name }}</option>{% endfor %}
+      </select>
+      <button class="button primary full">Sign in <span aria-hidden="true">↗</span></button>
+    </form>
+    <div class="demo-accounts">
+      <strong>One account. Connected support.</strong>
+      <p>Your configured demo account can access Ava Mitchell's student workspace and Amelia Carter's coordinator workspace at the same school.</p>
+      <small>Credentials are required for both workspaces. Synthetic project data only.</small>
+    </div>
+  </div>
+</section>
+{% endblock %}

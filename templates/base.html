@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Remote Education Hub{% endblock %} · 9120</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+{% macro icon(name) -%}
+<span class="icon" aria-hidden="true">{% if name == 'dashboard' %}◫{% elif name == 'resources' %}▦{% elif name == 'apply' %}＋{% elif name == 'reports' %}▤{% else %}☷{% endif %}</span>
+{%- endmacro %}
+{% if g.user %}
+<aside class="sidebar">
+  <a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-mark">c<span>↗</span></span><span>remote<span class="brand-sub">RESOURCE HUB</span></span></a>
+  <div class="workspace-tag"><span class="green-dot"></span> 9120 · Remote Education Hub</div>
+  <p class="nav-label">Workspace</p>
+  <nav aria-label="Main navigation">
+    <a class="{{ 'selected' if active == 'dashboard' }}" href="{{ url_for('dashboard') }}">{{ icon('dashboard') }}Overview <span class="nav-arrow">↗</span></a>
+    <a class="{{ 'selected' if active == 'resources' }}" href="{{ url_for('resource_list') }}">{{ icon('resources') }}Explore resources</a>
+    {% if g.user.role == 'student' %}<a class="{{ 'selected' if active == 'apply' }}" href="{{ url_for('application_new') }}">{{ icon('apply') }}New application</a>{% endif %}
+    <a class="{{ 'selected' if active == 'applications' }}" href="{{ url_for('application_list') }}">{{ icon('applications') }}{{ 'My applications' if g.user.role == 'student' else 'Review & allocate' }}</a>
+    {% if g.user.role == 'coordinator' %}<a class="{{ 'selected' if active == 'usage' }}" href="{{ url_for('usage') }}">{{ icon('applications') }}Usage records</a><a class="{{ 'selected' if active == 'reports' }}" href="{{ url_for('reports') }}">{{ icon('reports') }}Reports</a>{% endif %}
+  </nav>
+  <div class="sidebar-bottom"><div class="help-box"><span>Every resource opens a door.</span><p>Learning support, where it matters.</p></div><div class="profile"><span class="avatar">{{ g.user.name[0] }}</span><div><strong>{{ g.user.name }}</strong><small>{{ 'Student' if g.user.role == 'student' else 'Resource coordinator' }}</small></div><form method="post" action="{{ url_for('logout') }}"><input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"><button class="logout" title="Sign out" aria-label="Sign out">↪</button></form></div></div>
+</aside>
+{% endif %}
+<div class="{{ 'main-shell' if g.user else 'login-shell' }}">
+{% if g.user %}<header class="topbar"><span>Workspace <span class="slash">/</span> {{ self.title() }}</span><span class="role-pill">{{ 'STUDENT PORTAL' if g.user.role == 'student' else 'COORDINATOR PORTAL' }}</span></header>{% endif %}
+<main id="main-content">
+  <div class="demo-banner"><span class="demo-pill">{{ 'DEMO' if demo_mode else 'CUSTOM DATA' }}</span> Data: project seed.sql (synthetic) <span class="banner-divider">·</span> B Python backend connected · PostgreSQL</div>
+  {% for category, message in get_flashed_messages(with_categories=true) %}<div role="alert" class="flash {{ category }}">{{ message }}</div>{% endfor %}
+  {% block content %}{% endblock %}
+  <footer>9120 · Remote Education Hub <span>Connect resources. Enable learning. Database time: UTC.</span></footer>
+</main>
+</div>
+</body>
+</html>
