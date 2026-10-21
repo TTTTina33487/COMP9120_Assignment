@@ -1,0 +1,64 @@
+1
+00:00:00,000 --> 00:00:07,000
+Remote Education Resource Support System
+COMP9120 · Working prototype with synthetic data
+
+2
+00:00:08,061 --> 00:00:16,112
+01 / ACCOUNT SIGN-IN
+Account and masked password · Authorised student and coordinator workspaces
+
+3
+00:00:16,112 --> 00:00:23,883
+02 / STUDENT OVERVIEW
+Ava Mitchell · Requests, allocations and available support
+
+4
+00:00:23,883 --> 00:00:30,873
+03 / ELIGIBILITY-AWARE SEARCH
+B: list_offerings + list_suitable_offerings
+
+5
+00:00:30,873 --> 00:00:37,863
+04 / SUBMIT A LEARNING NEED
+B: submit_application · Quantity 2 · Priority high
+
+6
+00:00:37,863 --> 00:00:46,414
+05 / PERSISTED APPLICATION
+Student sees the saved request; stock is not reserved yet
+
+7
+00:00:46,414 --> 00:00:53,342
+06 / SCHOOL-SCOPED REVIEW
+Amelia Carter · Only applications from her own school
+
+8
+00:00:53,342 --> 00:01:00,488
+07 / CHECK BEFORE ALLOCATING
+B validates school, verified eligibility, expiry and capacity
+
+9
+00:01:00,488 --> 00:01:07,541
+08 / ATOMIC APPROVAL + ALLOCATION
+B: approve_and_allocate · Stock and decision commit together
+
+10
+00:01:07,541 --> 00:01:14,968
+09 / RECORD LEARNING ACTIVITY
+B: add_usage_record · Sequential record numbers per allocation
+
+11
+00:01:14,968 --> 00:01:22,770
+10 / TRACEABLE OUTCOMES
+Application → Allocation → Usage record
+
+12
+00:01:22,770 --> 00:01:37,000
+11 / LIVE REPORTS + CSV
+B: dashboard_metrics · utilisation_report · list_regions
+
+13
+00:01:37,000 --> 00:01:48,000
+47 passing integration checks + real browser workflow
+Password-protected demo account with assigned workspaces.

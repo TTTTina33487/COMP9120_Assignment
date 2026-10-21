@@ -1,0 +1,1 @@
+"""Campus Resource Hub prototype."""
