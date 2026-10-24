@@ -1,0 +1,151 @@
+Project RemoteEducationRevised {
+  database_type: 'PostgreSQL'
+  Note: 'Logical schema mapped from the revised lecture-notation ER model.'
+}
+
+Table remote_education.region {
+  region_id bigint [pk, increment]
+  region_name varchar(150) [not null, unique]
+  remoteness_level varchar(30) [not null]
+  internet_access_level varchar(30) [not null]
+  support_priority_level varchar(20) [not null]
+}
+
+Table remote_education.school {
+  school_id bigint [pk, increment]
+  region_id bigint [not null]
+  school_name varchar(200) [not null]
+  school_type varchar(50) [not null]
+
+  indexes {
+    (region_id, school_name) [unique]
+  }
+}
+
+Table remote_education.coordinator {
+  coordinator_id bigint [pk, increment]
+  school_id bigint [not null]
+  coordinator_name varchar(150) [not null]
+  role varchar(80) [not null]
+
+  indexes {
+    (school_id, coordinator_name) [unique]
+  }
+}
+
+Table remote_education.student {
+  student_id bigint [pk, increment]
+  school_id bigint [not null]
+  first_name varchar(80) [not null]
+  last_name varchar(80) [not null]
+  year_level smallint [not null]
+  has_device boolean [not null, default: false]
+  internet_access_level varchar(30) [not null]
+
+  indexes {
+    (school_id, first_name, last_name) [unique]
+  }
+}
+
+Table remote_education.eligibility_type {
+  eligibility_type_id bigint [pk, increment]
+  type_name varchar(100) [not null, unique]
+  description text [not null]
+}
+
+Table remote_education.student_eligibility {
+  student_id bigint [pk, not null]
+  eligibility_type_id bigint [pk, not null]
+  verified_date date
+  expiry_date date
+  verification_status varchar(20) [not null, default: 'pending']
+}
+
+Table remote_education.organisation {
+  organisation_id bigint [pk, increment]
+  organisation_name varchar(200) [not null, unique]
+  contact_email varchar(254) [not null, unique]
+}
+
+Table remote_education.provider {
+  organisation_id bigint [pk]
+  Note: 'Overlapping, partial subtype of ORGANISATION.'
+}
+
+Table remote_education.funder {
+  organisation_id bigint [pk]
+  Note: 'Overlapping, partial subtype of ORGANISATION.'
+}
+
+Table remote_education.resource_offering {
+  offering_id bigint [pk, increment]
+  provider_id bigint [not null]
+  required_eligibility_type_id bigint
+  resource_name varchar(200) [not null]
+  resource_type varchar(80) [not null]
+  subject_area varchar(100) [not null]
+  total_quantity integer [not null]
+  expiry_date date [not null]
+
+  indexes {
+    (provider_id, resource_name, expiry_date) [unique]
+  }
+}
+
+Table remote_education.resource_funding {
+  offering_id bigint [pk, not null]
+  funder_id bigint [pk, not null]
+}
+
+Table remote_education.application {
+  application_id bigint [pk, increment]
+  student_id bigint [not null]
+  offering_id bigint [not null]
+  reviewer_id bigint
+  application_date date [not null]
+  requested_quantity integer [not null]
+  learning_goal text [not null]
+  priority_level varchar(20) [not null]
+  decision_status varchar(20) [not null]
+  decision_date timestamptz
+  decision_reason text
+
+  indexes {
+    (student_id, offering_id, application_date) [unique]
+  }
+}
+
+Table remote_education.allocation {
+  allocation_id bigint [pk, increment]
+  application_id bigint [not null]
+  allocation_date timestamptz [not null]
+  quantity_allocated integer [not null]
+  allocation_status varchar(20) [not null]
+}
+
+Table remote_education.usage_record {
+  allocation_id bigint [pk, not null]
+  record_no integer [pk, not null, note: 'Partial key in the conceptual ER model.']
+  record_date date [not null]
+  usage_type varchar(80) [not null]
+  usage_status varchar(30) [not null]
+  notes text
+}
+
+Ref: remote_education.region.region_id < remote_education.school.region_id
+Ref: remote_education.school.school_id < remote_education.coordinator.school_id
+Ref: remote_education.school.school_id < remote_education.student.school_id
+Ref: remote_education.student.student_id < remote_education.student_eligibility.student_id
+Ref: remote_education.eligibility_type.eligibility_type_id < remote_education.student_eligibility.eligibility_type_id
+Ref: remote_education.organisation.organisation_id - remote_education.provider.organisation_id
+Ref: remote_education.organisation.organisation_id - remote_education.funder.organisation_id
+Ref: remote_education.provider.organisation_id < remote_education.resource_offering.provider_id
+Ref: remote_education.eligibility_type.eligibility_type_id < remote_education.resource_offering.required_eligibility_type_id
+Ref: remote_education.resource_offering.offering_id < remote_education.resource_funding.offering_id
+Ref: remote_education.funder.organisation_id < remote_education.resource_funding.funder_id
+Ref: remote_education.student.student_id < remote_education.application.student_id
+Ref: remote_education.resource_offering.offering_id < remote_education.application.offering_id
+Ref: remote_education.coordinator.coordinator_id < remote_education.application.reviewer_id
+Ref: remote_education.application.application_id < remote_education.allocation.application_id
+Ref: remote_education.allocation.allocation_id < remote_education.usage_record.allocation_id
+
